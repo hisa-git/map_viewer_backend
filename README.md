@@ -103,6 +103,12 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
+Activate the virtual envieronmont
+
+```
+source venv/bin/activate
+```
+
 Start the server:
 
 ```
