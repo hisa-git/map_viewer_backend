@@ -112,5 +112,5 @@ source venv/bin/activate
 Start the server:
 
 ```
-uvicorn main:app
+uvicorn main:app --reload --env-file .env
 ```
