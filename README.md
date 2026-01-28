@@ -29,22 +29,31 @@ Supported input formats:
 
 An R-tree spatial index is built for each layer after loading.
 
-## Required Data
+## Data preparation
 
-Download OpenStreetMap-based datasets from GeoFabrik:
+The backend loads 3 layers via GeoPandas:
 
-[https://download.geofabrik.de/europe.html](https://download.geofabrik.de/europe.html)
+(example for Ukraine)
 
-Example directory structure:
+- Buildings: `../data/ukraine-251121-free.shp/gis_osm_buildings_a_free_1.*`
+- Water: `../data/ukraine-251121-free.shp/gis_osm_water_a_free_1.*`
+- Roads: `../data/roads.geojson`
 
-```
-data/
-├── ukraine-251121-free.shp/
-│   ├── gis_osm_buildings_a_free_1.shp
-│   ├── gis_osm_water_a_free_1.shp
-│   └── ...
-├── roads.geojson
-```
+Download OSM datasets (GeoFabrik) and unpack into `data/`:
+
+- [https://download.geofabrik.de/europe.html](https://download.geofabrik.de/europe.html)
+
+`roads.geojson` must be created manually (any GIS tool / CLI conversion is fine). CRS does not matter: at startup all layers are reprojected to **EPSG:3857**.
+
+## Cleanup
+
+You can delete everything in `data/` except:
+
+- `gis_osm_buildings_a_free_1.*`
+- `gis_osm_water_a_free_1.*`
+- `roads.geojson`
+
+For shapefiles keep the sidecar files (`.shx`, `.dbf`, preferably also `.prj`, `.cpg`) with the same basename.
 
 ## Environment Configuration
 
