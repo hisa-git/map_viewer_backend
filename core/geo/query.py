@@ -9,7 +9,7 @@ WGS84 = 4326
 EPSG3857 = 3857
 
 _to_m   = Transformer.from_crs(WGS84, EPSG3857, always_xy=True)
-_to_wgs = Transformer.from_crs(EPSG3857, WGS84, always_xy=True)
+#_to_wgs = Transformer.from_crs(EPSG3857, WGS84, always_xy=True)
 
 
 def _wgs_bbox_to_meters(minx: float, miny: float,

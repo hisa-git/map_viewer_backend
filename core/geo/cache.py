@@ -1,4 +1,3 @@
-import copy
 from functools import lru_cache
 from config import GEO_CACHE_SIZE
 

@@ -15,7 +15,6 @@ FIELDS_CONFIG = {
 
 
 class WeatherSource:
-    """Абстрактный источник погоды."""
     async def fetch(self, lat: float, lon: float) -> Dict:
         raise NotImplementedError
 

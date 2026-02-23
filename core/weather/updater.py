@@ -28,7 +28,7 @@ async def weather_updater():
     )
     print(f"Generated grid with {len(grid)} points for region {REGION}")
 
-    source = OpenMeteoSource()  # один экземпляр на весь цикл жизни
+    source = OpenMeteoSource()
 
     while True:
         tasks = [fetch_weather(lat, lon, source) for lat, lon in grid]
