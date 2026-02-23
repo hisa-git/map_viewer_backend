@@ -1,19 +1,27 @@
+# Python bytecode
 __pycache__/
 *.py[cod]
 
+# Virtual environments
 .venv/
 venv/
+bin/
+lib/
+lib64/
+include/
+pyvenv.cfg
 
+# Env vars
 .env
 
+# Logs & cache
 *.log
-
 .cache/
 .pytest_cache/
-
 .coverage
 htmlcov/
 
-.DS_Store
+# IDE
 .vscode/
 .idea/
+.DS_Store
