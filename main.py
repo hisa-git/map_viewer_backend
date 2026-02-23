@@ -1,14 +1,15 @@
-from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
-import time
 import asyncio
-from weather.cache import get_weather_in_bbox
-from weather.updater import weather_updater
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
-from data import buildings, roads, water, to_m, to_wgs
-from query import query_layer
+from api.geo.router import router as geo_router
+from api.weather.router import router as weather_router
+from core.weather.updater import weather_updater
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,71 +18,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(geo_router)
+app.include_router(weather_router)
+
+
 @app.on_event("startup")
 async def start_updater():
     asyncio.create_task(weather_updater())
 
-def run(layer, *args):
-    t0 = time.time()
-    r = query_layer(layer, *args)
-    r.setdefault("metadata", {})
-    r["metadata"]["query_ms"] = round((time.time()-t0)*1000, 2)
-    return r
 
-
-@app.get("/chunk")
-def get_chunk(
-    minx: float, miny: float, maxx: float, maxy: float,
-    simplify: float = Query(1.0),
-    limit: int = Query(10000),
-    layer: str = Query("buildings")
-):
-    lname = layer.lower()
-    if lname.startswith("b"):
-        l = buildings
-    elif lname.startswith("r"):
-        l = roads
-    elif lname.startswith("w"):
-        l = water
-    else:
-        return {"error": "unknown layer", "layer": layer}
-
-    return run(l, minx, miny, maxx, maxy, simplify, limit)
-
-
-@app.get("/chunk/buildings")
-def c_b(minx: float, miny: float, maxx: float, maxy: float,
-        simplify: float = 1.0, limit: int = 10000):
-    return run(buildings, minx, miny, maxx, maxy, simplify, limit)
-
-
-@app.get("/chunk/roads")
-def c_r(minx: float, miny: float, maxx: float, maxy: float,
-        simplify: float = 0.0, limit: int = 5000):
-    return run(roads, minx, miny, maxx, maxy, simplify, limit)
-
-
-@app.get("/chunk/water")
-def c_w(minx: float, miny: float, maxx: float, maxy: float,
-        simplify: float = 0.5, limit: int = 5000):
-    return run(water, minx, miny, maxx, maxy, simplify, limit)
-
-
-@app.get("/bounds")
-def get_bounds():
-    return {
-        "buildings": buildings.total_bounds.tolist(),
-        "roads": roads.total_bounds.tolist(),
-        "water": water.total_bounds.tolist()
-    }
-
-@app.get("/weather/area")
-async def weather_area(
-    min_lat: float,
-    max_lat: float,
-    min_lon: float,
-    max_lon: float,
-    step: float = 0.05,
-):
-    points = get_weather_in_bbox(min_lat, max_lat, min_lon, max_lon, step)
-    return {"points": points} 
+@app.get("/metrics")
+def metrics():
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
