@@ -62,8 +62,7 @@ async def fetch_weather(lat: float, lon: float, source: WeatherSource) -> dict:
         now = datetime.now(timezone.utc)
         closest_idx = min(
             range(len(times)),
-            key=lambda i: abs(datetime.fromisoformat(times[i]) - now)
-        )
+            key=lambda i: abs(datetime.fromisoformat(times[i]).replace(tzinfo=timezone.utc) - now))
         for field, source_field in FIELDS_CONFIG.items():
             if source_field.startswith("hourly:"):
                 param_name = source_field.split(":", 1)[1]
